@@ -116,7 +116,7 @@ async def _controls(_, query: types.CallbackQuery):
             return await query.answer(query.lang["play_seek_no_dur"], show_alert=True)
 
         to_seek = int(args[3])
-        current_pos = int((time.time() - media.played_at) + media.time)
+        current_pos = int((time.time() - media.played_at) * media.speed + media.time)
         new_pos = current_pos + to_seek
 
         if new_pos < 1:

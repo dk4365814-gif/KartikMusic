@@ -39,7 +39,7 @@ async def _seek(_, m: types.Message):
 
     current_time = media.time
     if media.played_at:
-        current_time += int(time.time() - media.played_at)
+        current_time += int((time.time() - media.played_at) * media.speed)
 
     if m.command[0] == "seekback":
         stype = m.lang["backward"]

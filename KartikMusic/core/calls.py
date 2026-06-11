@@ -32,7 +32,7 @@ class TgCall(PyTgCalls):
 
         media = queue.get_current(chat_id)
         if media and media.played_at:
-            media.time += int(time.time() - media.played_at)
+            media.time += int((time.time() - media.played_at) * media.speed)
             media.played_at = None
 
         return await client.pause(chat_id)
@@ -91,9 +91,20 @@ class TgCall(PyTgCalls):
             await message.edit_text(_lang["error_no_file"].format(config.SUPPORT_CHAT))
             return await self.play_next(chat_id)
 
+        speed = getattr(media, "speed", 1.0)
         ffmpeg_params = (
             (f"-ss {seek_time} " if seek_time > 1 else "")
-            + ("-vn" if not media.video else "")
+            + ("-vn " if not media.video else "")
+            + (
+                f'-af "atempo={speed}" '
+                if speed != 1.0 and not media.video
+                else ""
+            )
+            + (
+                f'-vf "setpts={1.0/speed}*PTS" -af "atempo={speed}" '
+                if speed != 1.0 and media.video
+                else ""
+            )
         ).strip()
 
         stream = types.MediaStream(

@@ -173,6 +173,44 @@ class Inline:
             ]
         )
 
+    def speed_markup(self, _, chat_id):
+        return self.ikm(
+            [
+                [
+                    self.ikb(
+                        text="🕒 0.5x",
+                        callback_data=f"SpeedUP {chat_id}|0.5",
+                    ),
+                    self.ikb(
+                        text="🕓 0.75x",
+                        callback_data=f"SpeedUP {chat_id}|0.75",
+                    ),
+                ],
+                [
+                    self.ikb(
+                        text=_["P_B_4"],
+                        callback_data=f"SpeedUP {chat_id}|1.0",
+                    ),
+                ],
+                [
+                    self.ikb(
+                        text="🕤 1.5x",
+                        callback_data=f"SpeedUP {chat_id}|1.5",
+                    ),
+                    self.ikb(
+                        text="🕛 2.0x",
+                        callback_data=f"SpeedUP {chat_id}|2.0",
+                    ),
+                ],
+                [
+                    self.ikb(
+                        text=_["CLOSE_BUTTON"],
+                        callback_data="close",
+                    ),
+                ],
+            ]
+        )
+
     def lang_markup(self, _lang: str) -> types.InlineKeyboardMarkup:
         langs = lang.get_languages()
 
