@@ -15,6 +15,7 @@ from pyrogram import enums, errors, types
 from KartikMusic import app, config, db, logger, queue, yt
 from KartikMusic.helpers import utils
 
+
 def checkUB(play):
     async def wrapper(_, m: types.Message, *args, **kwargs):
         if not m.from_user:
@@ -35,8 +36,10 @@ def checkUB(play):
                 m.lang["play_queue_full"].format(config.QUEUE_LIMIT)
             )
 
-        force = kwargs.get("force") or m.command[0].endswith("force") or (
-            len(m.command) > 1 and "-f" in m.command[1]
+        force = (
+            kwargs.get("force")
+            or m.command[0].endswith("force")
+            or (len(m.command) > 1 and "-f" in m.command[1])
         )
         video = kwargs.get("video") or (m.command[0][0] == "v" and config.VIDEO_PLAY)
         url = kwargs.get("url") or utils.get_url(m)
