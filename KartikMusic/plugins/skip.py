@@ -21,5 +21,4 @@ async def _skip(_, m: types.Message):
     if not await db.get_call(m.chat.id):
         return await m.reply_text(m.lang["not_playing"])
 
-    await Kartik.play_next(m.chat.id)
-    await m.reply_text(m.lang["play_skipped"].format(m.from_user.mention))
+    await Kartik.play_next(m.chat.id, skip_user=m.from_user.mention)

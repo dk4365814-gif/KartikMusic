@@ -73,9 +73,11 @@ async def _controls(_, query: types.CallbackQuery):
         reply = query.lang["play_resumed"].format(user)
 
     elif action == "skip":
-        await Kartik.play_next(chat_id)
-        status = query.lang["skipped"]
-        reply = query.lang["play_skipped"].format(user)
+        await Kartik.play_next(chat_id, skip_user=user)
+        try:
+            return await query.answer()
+        except Exception:
+            return
 
     elif action == "force":
         pos, media = queue.check_item(chat_id, args[3])

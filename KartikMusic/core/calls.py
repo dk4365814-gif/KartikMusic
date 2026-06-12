@@ -202,11 +202,12 @@ class TgCall(PyTgCalls):
         media.message_id = msg.id
         await self.play_media(chat_id, msg, media)
 
-    async def play_next(self, chat_id: int) -> None:
+    async def play_next(self, chat_id: int, skip_user: str = None) -> None:
         if loop := await db.get_loop(chat_id):
             await db.set_loop(chat_id, loop - 1)
             return await self.replay(chat_id)
 
+        _lang = await lang.get_lang(chat_id)
         current = queue.get_current(chat_id)
         if current and current.message_id:
             try:
@@ -214,10 +215,18 @@ class TgCall(PyTgCalls):
             except Exception:
                 pass
 
-        media = queue.get_next(chat_id)
+        media = queue.get_next(chat_id, check=True)
         if not media:
             if await db.get_autoplay(chat_id):
                 if current and isinstance(current, Track):
+                    msg = None
+                    if skip_user:
+                        msg = await app.send_message(
+                            chat_id, _lang["autoplay_skip"].format(skip_user)
+                        )
+                    else:
+                        msg = await app.send_message(chat_id, _lang["autoplay_next"])
+
                     # Set max duration for autoplay tracks based on current song
                     # but capped at 15 minutes to avoid extremely long tracks
                     max_duration = min(int(current.duration_sec * 1.5), 900)
@@ -226,20 +235,44 @@ class TgCall(PyTgCalls):
                     )
                     if media:
                         queue.add(chat_id, media)
+                        # We need to call get_next to remove the old track from queue
+                        media = queue.get_next(chat_id)
+                        if not media.file_path:
+                            media.file_path = await yt.download(
+                                media.id, video=media.video
+                            )
+                            if not media.file_path:
+                                await self.stop(chat_id)
+                                try:
+                                    return await msg.edit_text(
+                                        _lang["error_no_file"].format(
+                                            config.SUPPORT_CHAT
+                                        )
+                                    )
+                                except Exception:
+                                    pass
+                                return
+
+                        media.message_id = msg.id
+                        return await self.play_media(chat_id, msg, media)
                     else:
                         await self.stop(chat_id)
-                        _lang = await lang.get_lang(chat_id)
+                        if msg:
+                            return await msg.edit_text(_lang["queue_finished"])
                         return await app.send_message(chat_id, _lang["queue_finished"])
                 else:
                     await self.stop(chat_id)
-                    _lang = await lang.get_lang(chat_id)
                     return await app.send_message(chat_id, _lang["queue_finished"])
             else:
                 await self.stop(chat_id)
-                _lang = await lang.get_lang(chat_id)
+                if skip_user:
+                    await app.send_message(
+                        chat_id, _lang["play_skipped"].format(skip_user)
+                    )
                 return await app.send_message(chat_id, _lang["queue_finished"])
 
-        _lang = await lang.get_lang(chat_id)
+        # If we reached here, there is a next media in the queue
+        media = queue.get_next(chat_id)
         msg = None
         if media.message_id:
             try:
@@ -248,27 +281,38 @@ class TgCall(PyTgCalls):
                     msg = None
                 else:
                     try:
-                        await msg.edit_text(_lang["play_next"])
+                        text = (
+                            _lang["play_skipped"].format(skip_user)
+                            + "\n\n"
+                            + _lang["play_next"]
+                            if skip_user
+                            else _lang["play_next"]
+                        )
+                        await msg.edit_text(text)
                     except Exception:
                         pass
             except Exception:
                 msg = None
 
         if not msg:
-            msg = await app.send_message(chat_id=chat_id, text=_lang["play_next"])
+            text = (
+                _lang["play_skipped"].format(skip_user) + "\n\n" + _lang["play_next"]
+                if skip_user
+                else _lang["play_next"]
+            )
+            msg = await app.send_message(chat_id=chat_id, text=text)
 
         if not media.file_path:
             media.file_path = await yt.download(media.id, video=media.video)
             if not media.file_path:
-                await self.play_next(chat_id)
                 if msg:
                     try:
-                        return await msg.edit_text(
+                        await msg.edit_text(
                             _lang["error_no_file"].format(config.SUPPORT_CHAT)
                         )
                     except Exception:
                         pass
-                return
+                return await self.play_next(chat_id)
 
         media.message_id = msg.id
         await self.play_media(chat_id, msg, media)

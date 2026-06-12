@@ -96,6 +96,8 @@
     "play_seek_min": "Minimum seek time is 10 seconds — try a bit longer!",
     "autoplay_on": "<b>Autoplay enabled by</b> {0}\n\nFrom now on, the bot will automatically play related music once the queue is empty.",
     "autoplay_off": "<b>Autoplay disabled by</b> {0}",
+    "autoplay_next": "Autoplay is on. Hold on...\n\nFetching and downloading a related track.",
+    "autoplay_skip": "<b>Stream skipped by {0}</b>\n\nAutoplay is on. Fetching a related track, please wait...",
     "vclog_on": "<b>VC Logger enabled by</b> {0}",
     "vclog_off": "<b>VC Logger disabled by</b> {0}",
     "vclog_usage": "<b>Usage:</b>\n\n<code>/{0} [on|off]</code>",
