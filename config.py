@@ -34,8 +34,8 @@ class Config:
         self.SESSION2 = getenv("SESSION2", None)
         self.SESSION3 = getenv("SESSION3", None)
 
-        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/meowqti")
-        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/Thealoneteam")
+        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/ABOUT_ROLEX_ANU")
+        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/+91aOX5qWDBZiM2E0")
 
         self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", "False").lower() == "true"
         self.AUTO_END: bool = getenv("AUTO_END", "False").lower() == "true"
@@ -53,8 +53,8 @@ class Config:
         self.DEFAULT_THUMB = getenv(
             "DEFAULT_THUMB", "https://te.legra.ph/file/3e40a408286d4eda24191.jpg"
         )
-        self.PING_IMG = getenv("PING_IMG", "https://files.catbox.moe/haagg2.png")
-        self.START_IMG = getenv("START_IMG", "https://files.catbox.moe/zvziwk.jpg")
+        self.PING_IMG = getenv("PING_IMG", "https://postimg.cc/H8JGVHDY")
+        self.START_IMG = getenv("START_IMG", "https://postimg.cc/H8JGVHDY")
 
     def check(self):
         missing = [
